@@ -1,9 +1,13 @@
 <template>
-  <Navbar/>
+  <div class="index">
+    <!-- <Navbar/> -->
+    <p>hi</p>
+  </div>
 </template>
 
 <script>
 import Navbar from '../components/Navbar'
+
 export default {
 
     head: {
@@ -20,8 +24,12 @@ export default {
           "REST Clinet, POSTMAN INSOMNIA GraphQL Websocket POST PUT GET OPTIONS HEADERS OAUTH  OAUTH2 "
       }
     ],
-    
   },
+  components:{
+    Navbar,
+  }
+
+
 }
 </script>
 
@@ -31,6 +39,12 @@ export default {
 @apply min-h-screen flex justify-center items-center text-center mx-auto;
 }
 */
-
+.index{
+  flex: 1;
+  background-color: black;
+  width: 100vw;
+  height: 100vh;
+  color:aliceblue;
+}
 
 </style>
