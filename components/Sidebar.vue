@@ -1,10 +1,10 @@
 <template>
   <div class="sidebar">
-      <p>REST</p>
-      <p>WebSocket</p>
-      <p>GraphQL</p>
-      <p>Documentation</p>
-      <p>Setting</p>
+      <p><nuxt-link to="/">REST</nuxt-link></p>
+      <p><nuxt-link to="/websocket">Websocket</nuxt-link></p>
+      <p><nuxt-link to="/graphql">GraphQL</nuxt-link></p>
+      <p><nuxt-link to="/documentation">Documentation</nuxt-link></p>
+      <p><nuxt-link to="/setting">Setting</nuxt-link></p>
       
   </div>
 </template>
@@ -17,15 +17,11 @@ export default {
 
 <style>
 .sidebar{
-    background-color: #040c0e;
-    color: #fff;
-    overflow-y: hidden;
-    position: fixed;
-    z-index: 90;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-evenly;
-    align-items: center;
-    height: 100vh;
+  background-color: black;
+color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
 }
 </style>

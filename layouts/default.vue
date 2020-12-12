@@ -1,20 +1,18 @@
 <template>
   <div class="default">
-    <SideBar/>
+    <Sidebar/>
     <Nuxt />
   </div>
 </template>
 
 <script>
 
-import Navbar from '../components/Navbar'
-import SideBar from '../components/Sidebar'
+import Sidebar from "../components/Sidebar"
 
 export default {
     components:{
-    Navbar,
-    SideBar
-  }
+      Sidebar
+    }
 
 }
 </script>
