@@ -1,23 +1,30 @@
 <template>
-  <div class="default">
+<div>
+    <Navbar/>
+
+<div class="default">
     <Sidebar/>
     <Nuxt />
   </div>
+</div>
+  
 </template>
 
 <script>
 
 import Sidebar from "../components/Sidebar"
+import Navbar from "../components/Navbar"
 
 export default {
     components:{
+      Navbar,
       Sidebar
     }
 
 }
 </script>
 <style>
-html {
+/* html {
   font-family:
     'Source Sans Pro',
     -apple-system,
@@ -41,7 +48,7 @@ html {
 *::after {
   box-sizing: border-box;
   margin: 0;
-}
+} */
 .default{
   display: flex;
   flex-direction: row;

@@ -17,7 +17,7 @@ export default {
 
 <style>
 .sidebar{
-  background-color: black;
+  background-color: #0A0A0A;
 color: #fff;
   display: flex;
   flex-direction: column;
