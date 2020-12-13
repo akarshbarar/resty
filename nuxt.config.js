@@ -26,7 +26,7 @@ export default {
   // Modules for dev and build (recommended) (https://go.nuxtjs.dev/config-modules)
   buildModules: [
     // https://go.nuxtjs.dev/tailwindcss
-    '@nuxtjs/tailwindcss',
+    // '@nuxtjs/tailwindcss',
   ],
 
   // Modules (https://go.nuxtjs.dev/config-modules)
@@ -48,10 +48,10 @@ export default {
   // Build Configuration (https://go.nuxtjs.dev/config-build)
   build: {
   },
-  tailwindcss: {
-    cssPath: './assets/css/tailwind.css',
-    configPath: './tailwind.config.js',
-    exposeConfig: false,
-    config: {}
-  }
+  // tailwindcss: {
+  //   cssPath: './assets/css/tailwind.css',
+  //   configPath: './tailwind.config.js',
+  //   exposeConfig: false,
+  //   config: {}
+  // }
 }

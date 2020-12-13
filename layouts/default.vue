@@ -24,7 +24,7 @@ export default {
 }
 </script>
 <style>
-/* html {
+html {
   font-family:
     'Source Sans Pro',
     -apple-system,
@@ -48,7 +48,14 @@ export default {
 *::after {
   box-sizing: border-box;
   margin: 0;
-} */
+}
+a{
+  text-decoration: none;
+  color: #fff;
+}
+li{
+ list-style: none; 
+}
 .default{
   display: flex;
   flex-direction: row;

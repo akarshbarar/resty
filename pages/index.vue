@@ -7,12 +7,24 @@
             <div class="mt-8 table w-full ...">
                   <div class="table-row-group">
                     <div class="table-row">
-                      <div class="table-cell ...">METHOD</div>
-                      <div class="table-cell ...">URL</div>
+                      <div class="table-cell text-xl ...">METHOD</div>
+                      <div class="table-cell text-xl...">URL</div>
                     </div>
                     <div class="table-row">
-                      <div class="table-cell ...">Cell 4</div>
+                      <div class="table-cell ...">
+
+                        <div class="dropdown">
+                          <button class="dropbtn">Dropdown</button>
+                          <div class="dropdown-content">
+                          <a href="#">Link 1</a>
+                          <a href="#">Link 2</a>
+                          <a href="#">Link 3</a>
+                          </div>
+                        </div>
+                      </div>
                       <div class="table-cell ..."><input type="url" placeholder="Enter URL"/></div>
+                      <div class="table-cell ..."><button class="">Message</button></div>
+
                     </div>
                   </div>
                 </div>
@@ -46,6 +58,7 @@ export default {
 </script>
 
 <style>
+
 /* Sample `apply` at-rules with Tailwind CSS
 .container {
 @apply min-h-screen flex justify-center items-center text-center mx-auto;
@@ -72,6 +85,43 @@ export default {
     padding: 5px;
     border-radius: 10px;
 
+}
+.dropbtn {
+  padding: 16px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {background-color: #f1f1f1}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.dropdown:hover .dropbtn {
+  background-color: #3e8e41;
 }
 
 </style>
