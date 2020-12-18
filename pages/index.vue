@@ -3,7 +3,7 @@
    <div class="index__main">
      <div class="index__mainContent">
             <div class="requestname">Request Name</div>
-            <input type="text" placeholder="Enter Request Name"/>
+            <input type="text" class="form__field" placeholder="Enter Request Name"/>
             <table>
               <thead>
                 <td><h3>METHODS</h3></td>
@@ -33,17 +33,23 @@
                   </div>
                 </td>
               </tbody>
-            </table>
-      
-            
+            </table>   
+     </div>
+
+     <div class="index__mainContent result">
+       <div>Status Code: {{resultCode}}</div>
+       <h1>Result</h1>
+      <pre>{{ result  }}</pre>
      </div>
    </div>
   </div>
 </template>
 
 <script>
-export default {
+// https://stackoverflow.com/questions/33545779/xmlhttprequest-setrequestheader-for-each-request
 
+export default {
+  
     head: {
         title: "Resty | Modern Rest Client",
         meta: [
@@ -59,19 +65,44 @@ export default {
           }
         ],
     },
-    data:{
-          url:'',
-          method:'GET',
+    data(){
+      return{
+             url:'',
+          method:'get',
           result:'',
           resultCode:''
       
+      }
+     
     },
+  
     methods:{
         async send(){
-          console.log(this.url);
-          console.log(this.method);
-          this.result = await this.$http.$get('https://api.nuxtjs.dev/posts')
-          console.log(this.result);
+                var getJSON = function(method,url, callback) {
+                  var xhr = new XMLHttpRequest();
+                  xhr.open(method, url, true);
+                  xhr.responseType = 'json';
+                  xhr.onload = function() {
+                    var status = xhr.status;
+                    if (status === 200) {
+                      callback('200', xhr.response);
+                    } else {
+                      callback(status, xhr.response);
+                    }
+                  };
+                  xhr.send();
+              };
+              getJSON(this.method,this.url,(status,data)=>{
+                this.resultCode=status
+                if(status=='404'){
+                  this.result=`{'message':'Not Found'}`
+                }
+                else{
+                this.result=data;
+
+                }
+              });
+         
         }
     },
     
@@ -87,6 +118,17 @@ export default {
 @apply min-h-screen flex justify-center items-center text-center mx-auto;
 }
 */
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+*::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+* {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
 .index{
   background-color: black;
   display: flex;
@@ -94,6 +136,14 @@ export default {
   width: 100vw;
   height: 100vh;
   padding: 2px;
+  overflow: hidden;
+}
+.result{
+  height: 300px;
+  overflow-y:scroll ;
+  width: 300px;
+
+
 }
 
 .index__main{
@@ -105,12 +155,14 @@ export default {
     background-color: #0A0A0A;
     margin-left: auto;
     margin-right: auto;
-    width: fit-content;    
+    margin-top: 1rem;
+    width: 50vw;    
     padding: 1rem;
     border-radius: 10px;
 
 }
 table,td{
+  padding: 1rem;
   margin-top: 1rem;
      /* border: 1px solid red; */
 }
@@ -210,6 +262,7 @@ select{
   /* margin-left: -96px; */
 }
 
+
 .form{
   display: flex;
 }
@@ -234,4 +287,34 @@ only screen and (max-width: 1052px)
 }
 
 }
+/* PRETIFY JSON */
+
+
+pre {
+  padding: 5px;
+  margin: 5px;
+        word-break: break-all;
+
+}
+
+.string {
+  color: green;
+}
+
+.number {
+  color: darkorange;
+}
+
+.boolean {
+  color: blue;
+}
+
+.null {
+  color: magenta;
+}
+
+.key {
+  color: red;
+}
+
 </style>
