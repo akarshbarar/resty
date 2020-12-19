@@ -36,6 +36,7 @@
               </tbody>
             </table>   
        </div>
+       
        <div class="index__mainContent history">
          <h2>History <button @click.prevent="deleteAll()" class="btn btn--primary btn--inside uppercase">Clear History</button></h2>
           <ul v-for="item in historyDb" :key="item">
@@ -56,7 +57,54 @@
         </ul>
        </div>
      </div>
-     
+     <div class="index__mainContent" v-if="method=='post' || method=='put' || method=='delete' || method=='patch'">
+
+<div style="display:flex; flex-direction:row;">
+     <h2>Content Type:</h2>
+     <select class="dropbtn" >
+        <option >application/json</option>
+        <option >application/vnd.api+json</option>
+        <option >application/hal+json</option>
+        <option >application/xml</option>
+        <option >application/x-www-form-urlencoded</option>
+        <option>text/html</option>
+        
+      </select>
+    
+</div>
+<div class="worko-tabs">
+  
+    <input class="state" type="radio" title="tab-one" name="tabs-state" id="tab-one" checked />
+    <input class="state" type="radio" title="tab-two" name="tabs-state" id="tab-two" />
+    <input class="state" type="radio" title="tab-three" name="tabs-state" id="tab-three" />
+    <input class="state" type="radio" title="tab-four" name="tabs-state" id="tab-four" />
+
+    <div class="tabs flex-tabs">
+        <label for="tab-one" id="tab-one-label" class="tab">Parameters</label>
+        <label for="tab-two" id="tab-two-label" class="tab">Headers</label>
+        <label for="tab-three" id="tab-three-label" class="tab">Authentication</label>
+        <label for="tab-four" id="tab-four-label" class="tab">Body</label>
+
+
+        <div id="tab-one-panel" class="panel active">
+        <h1>Parameters</h1>          
+        </div>
+        <div id="tab-two-panel" class="panel">
+            <h1>Headers</h1>
+        </div>
+        <div id="tab-three-panel" class="panel">
+            <h1>Authentication</h1>
+        </div>
+       <div id="tab-four-panel" class="panel">
+            <textarea cols="50" rows="20"/>
+        </div>
+
+    </div>
+
+</div>
+
+
+       </div>
 
      <div class="index__mainContent result">
        <div>Status Code: {{resultCode}}</div>
@@ -114,7 +162,7 @@ export default {
             this.historyDb=db
 
       },
-      deleteAll:()=>{
+      deleteAll:function(){
           db.splice(0,db.length)
           this.historyDb=[]
 
@@ -152,6 +200,7 @@ export default {
                 }
               });
          
+       
         }
     },                                                                                                        
     
@@ -160,7 +209,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
 
 /* Sample `apply` at-rules with Tailwind CSS
 .container {
@@ -185,7 +234,6 @@ export default {
   width: 100vw;
   height: 100vh;
   padding: 2px;
-  overflow: hidden;
 }
 
 .result{
@@ -370,24 +418,119 @@ pre {
 
 }
 
-.string {
-  color: green;
+
+/* tabs */
+
+
+
+
+/* Android 2.3 :checked fix */
+@keyframes fake {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 1;
+    }
+}
+body {        
+    animation: fake 1s infinite;
 }
 
-.number {
-  color: darkorange;
+.worko-tabs {
+    margin: 20px;
+  	width: 80%;
+  
+    .state{
+      position: absolute;
+      left: -10000px;
+    }
+  
+    .flex-tabs{
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+        
+        .tab{
+          flex-grow: 1;
+          max-height: 40px;
+        }
+      
+        .panel {
+          background-color: transparent;
+          padding: 20px;
+          display: none;
+          width: 100%;
+          flex-basis: auto;
+      }
+    }
+
+    .tab {
+      display: inline-block;
+      padding: 10px;
+      vertical-align: top;
+      cursor: hand;
+      cursor: pointer;
+      border-left: 10px solid #ccc;
+      
+        &:hover{
+          background-color: #7f8ff4;
+        }
+    }  
 }
 
-.boolean {
-  color: blue;
+#tab-one:checked ~ .tabs #tab-one-label,
+#tab-two:checked ~ .tabs #tab-two-label,
+#tab-three:checked ~ .tabs #tab-three-label,
+#tab-four:checked ~ .tabs #tab-four-label{
+    cursor: default;
+    border-left-color: #69be28;
 }
 
-.null {
-  color: magenta;
+#tab-one:checked ~ .tabs #tab-one-panel,
+#tab-two:checked ~ .tabs #tab-two-panel,
+#tab-three:checked ~ .tabs #tab-three-panel,
+#tab-four:checked ~ .tabs #tab-four-panel{
+    display: block;
 }
 
-.key {
-  color: red;
+@media (max-width: 600px){
+  .flex-tabs{
+    flex-direction: column;
+    
+    .tab{
+      border-bottom: 1px solid #ccc;
+      
+        &:last-of-type{
+          border-bottom: none;
+        }
+    }
+    
+    #tab-one-label{order:1;}
+    #tab-two-label{order: 3;}
+    #tab-three-label{order: 5;};
+    #tab-four-label{order: 7;};
+    #tab-one-panel{order: 2;}
+    #tab-two-panel{order: 4;}
+    #tab-three-panel{order: 6;}
+    #tab-four-panel{ order: 8;}
+  }
+  
+    #tab-one:checked ~ .tabs #tab-one-label,
+    #tab-two:checked ~ .tabs #tab-two-label,
+    #tab-three:checked ~ .tabs #tab-three-label,
+    #tab-four:checked ~ .tabs #tab-four-label{
+      border-bottom: none;
+    }
+  
+  #tab-one:checked ~ .tabs #tab-one-panel,
+  #tab-two:checked ~ .tabs #tab-two-panel,
+  #tab-three:checked ~ .tabs #tab-three-panel,
+  #tab-four:checked ~ .tabs #tab-four-panel{
+    border-bottom: 1px solid #ccc;
+  }
 }
+
+
 
 </style>
