@@ -1,9 +1,10 @@
 <template>
   <div class="index">
    <div class="index__main">
-     <div class="index__mainContent">
+     <div class="withHistory">
+       <div class="index__mainContent">
             <div class="requestname">Request Name</div>
-            <input type="text" class="form__field" placeholder="Enter Request Name"/>
+            <input type="text" class="form__field" v-model="requestName" placeholder="Enter Request Name"/>
             <table>
               <thead>
                 <td><h3>METHODS</h3></td>
@@ -34,7 +35,28 @@
                 </td>
               </tbody>
             </table>   
+       </div>
+       <div class="index__mainContent history">
+         <h2>History <button @click.prevent="deleteAll()" class="btn btn--primary btn--inside uppercase">Clear History</button></h2>
+          <ul v-for="item in historyDb" :key="item">
+          <li class="historyCode">
+          
+            <p><h4> {{ item["METHOD"] }}</h4> </p>
+            <p>&#9728;</p>
+            <p><h4>  {{ item["STATUS CODE"] }}</h4></p>
+            <p>&#9728;</p>
+            <p><h4> {{ item["REQUEST NAME"] }}</h4></p>
+            <button @click.prevent="deleteURL(item)" class="btn btn--primary btn--inside uppercase">Delete</button>
+          </li>
+          
+          <li>
+           <p> {{ item["URL"] }} </p>
+          </li>
+         
+        </ul>
+       </div>
      </div>
+     
 
      <div class="index__mainContent result">
        <div>Status Code: {{resultCode}}</div>
@@ -47,8 +69,13 @@
 
 <script>
 // https://stackoverflow.com/questions/33545779/xmlhttprequest-setrequestheader-for-each-request
-
+import db from '../content/db'
 export default {
+
+  mounted(){
+
+
+  },
   
     head: {
         title: "Resty | Modern Rest Client",
@@ -67,16 +94,31 @@ export default {
     },
     data(){
       return{
-             url:'',
+          url:'',
           method:'get',
           result:'',
-          resultCode:''
-      
+          resultCode:'',
+          requestName:null,
+          historyDb:[]
       }
      
     },
   
     methods:{
+      deleteURL:function(item){
+          console.log(item);
+          const index = db.indexOf(item);
+            if (index > -1) {
+              db.splice(index, 1);
+            }
+            this.historyDb=db
+
+      },
+      deleteAll:()=>{
+          db.splice(0,db.length)
+          this.historyDb=[]
+
+      },
         async send(){
                 var getJSON = function(method,url, callback) {
                   var xhr = new XMLHttpRequest();
@@ -99,12 +141,19 @@ export default {
                 }
                 else{
                 this.result=data;
-
+                  db.push({
+                    "REQUEST NAME":this.requestName==null?"Untitiled Request":this.requestName,
+                    "URL":this.url,
+                    "METHOD":this.method,                                                                                                 
+                    "STATUS CODE":this.resultCode
+                  });
+                  this.historyDb=db;
+                  console.log(db);
                 }
               });
          
         }
-    },
+    },                                                                                                        
     
 
 
@@ -138,6 +187,7 @@ export default {
   padding: 2px;
   overflow: hidden;
 }
+
 .result{
   height: 300px;
   overflow-y:scroll ;
@@ -161,6 +211,17 @@ export default {
     border-radius: 10px;
 
 }
+.history{
+  width:20vw ;
+  height: 300px;
+    overflow-y:scroll ;
+
+}
+.withHistory{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
 table,td{
   padding: 1rem;
   margin-top: 1rem;
@@ -183,6 +244,15 @@ select{
 
 }
 
+.historyCode{
+  color: #6c7ff2;
+  text-transform: uppercase;
+  display: flex;
+  flex-direction: row;
+  margin-top: 10px;
+  padding: 5px;
+
+}
 .dropdown {
   position: relative;
   display: inline-block;
@@ -267,7 +337,7 @@ select{
   display: flex;
 }
 .form__field {
-  width: 360px;
+  width: clamp(20px,20vw,360px);
   background: #fff;
   color: #a3a3a3;
   font: inherit;
@@ -278,12 +348,15 @@ select{
 }
 
 @media 
-only screen and (max-width: 1052px)
+only screen and (max-width: 1352px)
 {
 
 .form{
   display: flex;
   flex-direction: column;
+}
+.history{
+  display: none;
 }
 
 }
