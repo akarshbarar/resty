@@ -61,13 +61,13 @@
 
 <div style="display:flex; flex-direction:row;">
      <h2>Content Type:</h2>
-     <select class="dropbtn" >
-        <option >application/json</option>
-        <option >application/vnd.api+json</option>
-        <option >application/hal+json</option>
-        <option >application/xml</option>
-        <option >application/x-www-form-urlencoded</option>
-        <option>text/html</option>
+     <select class="dropbtn" v-model="responseType" >
+        <option value="application/json" >application/json</option>
+        <option value="application/vnd.api+json" >application/vnd.api+json</option>
+        <option value="application/hal+json" >application/hal+json</option>
+        <option value="application/xml" >application/xml</option>
+        <option value="application/x-www-form-urlencoded" >application/x-www-form-urlencoded</option>
+        <option value="text/html" >text/html</option>
         
       </select>
     
@@ -87,7 +87,24 @@
 
 
         <div id="tab-one-panel" class="panel active">
-        <h1>Parameters</h1>          
+          <h1>Parameters</h1>
+          <table class="parameter_table" >
+            <tr>
+              <th><h5>KEY</h5></th>
+              <th><h5>VALUE</h5></th>
+            </tr>
+            <tr v-for="i in parameter_rowLength" :key="i">
+              <td><input type="text" class="form__field keyValue" v-model="param_key" placeholder="Enter KEY" /></td>
+              <td>
+                <input type="text" class="form__field keyValue" v-model="param_value" placeholder="Enter VALUE" />
+              </td>
+              <td>
+              </td>
+
+            </tr>
+          </table>
+        <button @click.prevent="addParameterRows" class="btn btn--primary btn--inside uppercase">Add Row</button>
+
         </div>
         <div id="tab-two-panel" class="panel">
             <h1>Headers</h1>
@@ -96,7 +113,7 @@
             <h1>Authentication</h1>
         </div>
        <div id="tab-four-panel" class="panel">
-            <textarea cols="50" rows="20"/>
+            <textarea class="textarea" cols="50" rows="20"/>
         </div>
 
     </div>
@@ -144,15 +161,37 @@ export default {
       return{
           url:'',
           method:'get',
+          responseType:'application/json',
           result:'',
           resultCode:'',
           requestName:null,
-          historyDb:[]
+          historyDb:[],
+          parameter_row:'?',
+          parameter_rowLength:0,
+          param_key:null,
+          param_value:null
       }
      
     },
   
     methods:{
+      addParameterRows:function(){
+          let l=this.parameter_row.length
+          if((this.param_key==null || this.param_value==null)){
+            alert("Parameters cannot be empty")
+          }else
+          if(l==1 && this.param_key==null && this.param_value==null)
+          {
+            //! DO Nothing
+          }
+          else{
+            this.parameter_row+=this.param_key+"="+this.param_value+"&"
+          }
+          
+      },
+      deleteThisRow:function(i){
+
+      },
       deleteURL:function(item){
           console.log(item);
           const index = db.indexOf(item);
@@ -168,10 +207,12 @@ export default {
 
       },
         async send(){
-                var getJSON = function(method,url, callback) {
+          if(this.method=='get'){
+
+              var getJSON = function(method,url, responseType,callback) {
                   var xhr = new XMLHttpRequest();
                   xhr.open(method, url, true);
-                  xhr.responseType = 'json';
+                  xhr.responseType = responseType;
                   xhr.onload = function() {
                     var status = xhr.status;
                     if (status === 200) {
@@ -182,7 +223,7 @@ export default {
                   };
                   xhr.send();
               };
-              getJSON(this.method,this.url,(status,data)=>{
+              getJSON(this.method,this.url,this.responseType,(status,data)=>{
                 this.resultCode=status
                 if(status=='404'){
                   this.result=`{'message':'Not Found'}`
@@ -199,8 +240,45 @@ export default {
                   console.log(db);
                 }
               });
-         
-       
+          }
+          if(this.method=='post'){
+            if(this.parameter_row.charAt(this.parameter_row.length-1)=="&"){
+              this.parameter_row=this.parameter_row.substring(0,this.parameter_row.length-1)
+              console.log(this.parameter_row);
+            }
+            var getJSON = function(method,url,responseType, callback) {
+                  var xhr = new XMLHttpRequest();
+                  xhr.open(method, url, true);
+                  xhr.responseType = responseType;
+                  xhr.onload = function() {
+                    var status = xhr.status;
+                    if (status === 200) {
+                      callback('200', xhr.response);
+                    } else {
+                      callback(status, xhr.response);
+                    }
+                  };
+                  xhr.send();
+              };
+              getJSON(this.method,this.url,this.responseType,(status,data)=>{
+                this.resultCode=status
+                if(status=='404'){
+                  this.result=`{'message':'Not Found'}`
+                }
+                else{
+                this.result=data;
+                  db.push({
+                    "REQUEST NAME":this.requestName==null?"Untitiled Request":this.requestName,
+                    "URL":this.url,
+                    "METHOD":this.method,                                                                                                 
+                    "STATUS CODE":this.resultCode
+                  });
+                  this.historyDb=db;
+                  console.log(db);
+                }
+              });
+          }
+              
         }
     },                                                                                                        
     
@@ -236,6 +314,10 @@ export default {
   padding: 2px;
 }
 
+.textarea{
+  background-color: transparent !important;
+  color: #fff;
+}
 .result{
   height: 300px;
   overflow-y:scroll ;
@@ -244,6 +326,10 @@ export default {
 
 }
 
+.keyValue{
+  background-color: transparent !important;
+  color: #fff;
+}
 .index__main{
   flex: 5;
   padding: 5px;
