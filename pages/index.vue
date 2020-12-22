@@ -93,17 +93,23 @@
               <th><h5>KEY</h5></th>
               <th><h5>VALUE</h5></th>
             </tr>
-            <tr v-for="i in parameter_rowLength" :key="i">
+            <tr v-for="i in parameter_row" :key="i">
+              <td class="form__field keyValue">{{i.key}}</td>
+              <td class="form__field keyValue">{{i.value}}</td>
+            </tr>
+          </table>
+          <table class="parameter_table" >
+          
+            <tr>
               <td><input type="text" class="form__field keyValue" v-model="param_key" placeholder="Enter KEY" /></td>
               <td>
                 <input type="text" class="form__field keyValue" v-model="param_value" placeholder="Enter VALUE" />
               </td>
               <td>
               </td>
-
             </tr>
           </table>
-        <button @click.prevent="addParameterRows" class="btn btn--primary btn--inside uppercase">Add Row</button>
+        <button @click.prevent="addParameterRows" class="btn btn--primary btn--inside uppercase">Add</button>
 
         </div>
         <div id="tab-two-panel" class="panel">
@@ -166,8 +172,7 @@ export default {
           resultCode:'',
           requestName:null,
           historyDb:[],
-          parameter_row:'?',
-          parameter_rowLength:0,
+          parameter_row:[],
           param_key:null,
           param_value:null
       }
@@ -176,17 +181,13 @@ export default {
   
     methods:{
       addParameterRows:function(){
-          let l=this.parameter_row.length
-          if((this.param_key==null || this.param_value==null)){
-            alert("Parameters cannot be empty")
-          }else
-          if(l==1 && this.param_key==null && this.param_value==null)
-          {
-            //! DO Nothing
-          }
-          else{
-            this.parameter_row+=this.param_key+"="+this.param_value+"&"
-          }
+          
+          this.parameter_row.push({
+            "key":this.param_key,
+            "value":this.param_value
+          })
+          this.param_key=null;
+          this.param_value=null;        
           
       },
       deleteThisRow:function(i){
@@ -242,10 +243,24 @@ export default {
               });
           }
           if(this.method=='post'){
-            if(this.parameter_row.charAt(this.parameter_row.length-1)=="&"){
-              this.parameter_row=this.parameter_row.substring(0,this.parameter_row.length-1)
-              console.log(this.parameter_row);
+            
+            this.url=this.url+"?";
+            
+            for(let i=0;i<this.parameter_row.length;i++){
+              console.log("Insde loop");
+              if(i.key==null || i.value==null){
+                // DO NOTHING
+              }else{
+                if(i==this.parameter_row.length-1)
+                {
+                   this.url=this.url+i.key+"="+i.value
+                }
+                else{
+                  this.url=this.url+i.key+"="+i.value+"&"
+                }
+              }
             }
+            console.log(this.url);
             var getJSON = function(method,url,responseType, callback) {
                   var xhr = new XMLHttpRequest();
                   xhr.open(method, url, true);
