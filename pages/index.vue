@@ -114,9 +114,68 @@
         </div>
         <div id="tab-two-panel" class="panel">
             <h1>Headers</h1>
+            
+             <table class="parameter_table" >
+            <tr>
+              <th><h5>KEY</h5></th>
+              <th><h5>VALUE</h5></th>
+            </tr>
+            <tr v-for="i in header_row" :key="i">
+              <td class="form__field keyValue">{{i.key}}</td>
+              <td class="form__field keyValue">{{i.value}}</td>
+            </tr>
+          </table>
+          <table class="parameter_table" >
+          
+            <tr>
+              <td><input type="text" class="form__field keyValue" v-model="header_key" placeholder="Enter KEY" /></td>
+              <td>
+                <input type="text" class="form__field keyValue" v-model="header_value" placeholder="Enter VALUE" />
+              </td>
+              <td>
+              </td>
+            </tr>
+          </table>
+        <button @click.prevent="addHeaderRows" class="btn btn--primary btn--inside uppercase">Add</button>
+
         </div>
         <div id="tab-three-panel" class="panel">
             <h1>Authentication</h1>
+
+             <select class="dropbtn" v-model="authType" >
+                <option value="noauth" >No Auth</option>
+                <option value="basciauth" >Basic Auth</option>
+                <option value="bearertoken" >Bearer Token</option>
+                <option value="oauthone" >OAuth1.0</option>
+                <option value="oauthtwo" >OAuth2.0</option>
+                <option value="digestauth" >Digest Auth</option>
+                <option value="apikey" >API key</option>
+                
+              </select>
+    
+          <div v-if="authType=='basciauth'">
+            <h1>Bsic auth</h1>
+            <!-- XMLReq.setRequestHeader("Authorization", "Basic " + btoa("username:password")); -->
+          </div>
+          <div v-if="authType=='bearertoken'">
+            <h1>bearertoken auth</h1>
+            <!-- xhr.setRequestHeader("Authorization", "Bearer hhhh"); -->
+
+          </div>
+          <div v-if="authType=='oauthone'">
+            <h1>oauthone auth</h1>
+          </div>
+          <div v-if="authType=='oauthtwo'">
+            <h1>oauthtwo auth</h1>
+            <!-- xhr.setRequestHeader("Authorization", "Bearer ddd"); -->
+<!--  -->
+          </div>
+          <div v-if="authType=='digestauth'">
+            <h1>digestauth auth</h1>
+          </div>
+          <div v-if="authType=='apikey'">
+            <h1>apikey auth</h1>
+          </div>
         </div>
        <div id="tab-four-panel" class="panel">
             <textarea class="textarea" cols="50" rows="20"/>
@@ -140,6 +199,8 @@
 
 <script>
 // https://stackoverflow.com/questions/33545779/xmlhttprequest-setrequestheader-for-each-request
+// 
+// https://codepen.io/okproject/pen/meemGQ
 import db from '../content/db'
 export default {
 
@@ -168,13 +229,17 @@ export default {
           url:'',
           method:'get',
           responseType:'application/json',
+          authType:'noauth',
           result:'',
           resultCode:'',
           requestName:null,
           historyDb:[],
           parameter_row:[],
+          header_row:[],
           param_key:null,
-          param_value:null
+          param_value:null,
+          header_key:null,
+          header_value:null
       }
      
     },
@@ -188,6 +253,16 @@ export default {
           })
           this.param_key=null;
           this.param_value=null;        
+          
+      },
+       addHeaderRows:function(){
+          
+          this.header_row.push({
+            "key":this.header_key,
+            "value":this.header_value
+          })
+          this.header_key=null;
+          this.header_value=null;        
           
       },
       deleteThisRow:function(i){
@@ -245,26 +320,31 @@ export default {
           if(this.method=='post'){
             
             this.url=this.url+"?";
-            
+            console.log("PArameter row is",this.parameter_row);
             for(let i=0;i<this.parameter_row.length;i++){
-              console.log("Insde loop");
-              if(i.key==null || i.value==null){
+              console.log("Insde loop"+i);
+              if(this.parameter_row[i]["key"]==null || this.parameter_row[i]["value"]==null){
                 // DO NOTHING
               }else{
                 if(i==this.parameter_row.length-1)
                 {
-                   this.url=this.url+i.key+"="+i.value
+                  console.log("Last");
+                   this.url=this.url+this.parameter_row[i]["key"]+"="+this.parameter_row[i]["value"]
                 }
                 else{
-                  this.url=this.url+i.key+"="+i.value+"&"
+                  console.log("Oters");
+                  this.url=this.url+this.parameter_row[i]["key"]+"="+this.parameter_row[i]["value"]+"&"
                 }
               }
             }
             console.log(this.url);
-            var getJSON = function(method,url,responseType, callback) {
+            var getJSON = function(method,url,responseType,header, callback) {
                   var xhr = new XMLHttpRequest();
                   xhr.open(method, url, true);
                   xhr.responseType = responseType;
+                  for(let i=0;i<header.length;i++){
+                        xhr.setRequestHeader(header[i]["key"],header[i]["value"])
+                  }
                   xhr.onload = function() {
                     var status = xhr.status;
                     if (status === 200) {
@@ -275,7 +355,7 @@ export default {
                   };
                   xhr.send();
               };
-              getJSON(this.method,this.url,this.responseType,(status,data)=>{
+              getJSON(this.method,this.url,this.responseType,this.header_row,(status,data)=>{
                 this.resultCode=status
                 if(status=='404'){
                   this.result=`{'message':'Not Found'}`
