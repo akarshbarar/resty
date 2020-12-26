@@ -158,13 +158,11 @@
             <input type="text" class="form__field keyValue"  v-model="basicauth_username" placeholder="Enter Username">
             <input type="text" class="form__field keyValue"  v-model="basicauth_password"  placeholder="Enter Password">
             
-            <!-- XMLReq.setRequestHeader("Authorization", "Basic " + btoa("username:password")); -->
           </div>
           <div v-if="authType=='bearertoken'">
             <h1>bearertoken auth</h1>
             <input type="text" class="form__field keyValue" v-model="bearertoken_token" placeholder="Enter token">
 
-            <!-- xhr.setRequestHeader("Authorization", "Bearer hhhh"); -->
 
           </div>
           <div v-if="authType=='oauthone'">
@@ -175,7 +173,6 @@
             <h1>oauthtwo auth</h1>
            <input type="text" class="form__field keyValue" v-model="oauthtwo_token"  placeholder="Enter token">
 
-            <!-- xhr.setRequestHeader("Authorization", "Bearer ddd"); -->
           </div>
           <div v-if="authType=='digestauth'">
             <h1>digestauth auth</h1>
@@ -211,20 +208,6 @@
 import db from '../content/db'
 export default {
 
-  mounted(){
-
-
-
-// var obj={"glossary":{"title":"example glossary","GlossDiv":{"title":"S","GlossList":{"GlossEntry":{"ID":"SGML","SortAs":"SGML","GlossTerm":"Standard Generalized Markup Language","Acronym":"SGML","Abbrev":"ISO 8879:1986","GlossDef":{"para":"A meta-markup language, used to create markup languages such as DocBook.","GlossSeeAlso":["GML","XML"]},"GlossSee":"markup"}}}}}
-
-
-// var pretty = JSON.stringify(obj, undefined, 2);
-
-// var ugly = document.getElementById('myTextArea').value;
-// document.getElementById('myTextArea').value = pretty;
-
-
-  },
   
     head: {
         title: "Resty | Modern Rest Client",
@@ -308,40 +291,34 @@ export default {
 
           if(this.method=='get'){
 
-              var getJSON = function(method,url, responseType,callback) {
-                  var xhr = new XMLHttpRequest();
-                  xhr.open(method, url, true);
-                  xhr.responseType = responseType;
-                  xhr.onload = function() {
-                    var status = xhr.status;
-                    if (status === 200) {
-                      callback('200', xhr.response);
-                    } else {
-                      callback(status, xhr.response);
-                    }
-                  };
-                  xhr.send();
-              };
-              getJSON(this.method,this.url,this.responseType,(status,data)=>{
-                this.resultCode=status
-                if(status=='404'){
-                  this.result=`{'message':'Not Found'}`
-                }
-                else{
-                this.result=data;
-                  db.push({
-                    "REQUEST NAME":this.requestName==null?"Untitiled Request":this.requestName,
-                    "URL":this.url,
-                    "METHOD":this.method,                                                                                                 
-                    "STATUS CODE":this.resultCode
-                  });
-                  this.historyDb=db;
-                  console.log(db);
-                }
+              var request=new Request(this.url,{
+                method:"GET",
+                body:this.body,
+                headers:new Headers()
               });
+
+                    fetch(request)
+                    .then(response =>{
+                      console.log(response);
+                        this.resultCode=response.status
+                        return response.json()
+                    } )
+                    .then(data => {
+                    this.result=data
+                          db.push({
+                              "REQUEST NAME":this.requestName==null?"Untitiled Request":this.requestName,
+                              "URL":this.url,
+                              "METHOD":"GET",                                                                                                 
+                              "STATUS CODE":this.resultCode
+                            });
+                            this.historyDb=db;
+                          console.log(data)
+                          }
+                    );
+
           }
           if(this.method=='post'){
-            
+
             this.url=this.url+"?";
             console.log("PArameter row is",this.parameter_row);
             for(let i=0;i<this.parameter_row.length;i++){
@@ -362,83 +339,143 @@ export default {
             }
 
 
-            var getJSON = function(
-                method,
-                url,
-                responseType,
-                header,
-                authType,
-                basicauth_username,
-                basicauth_password,
-                bearertoken_token,
-                oauthtwo_token,
-                body,
-                callback) {
-                  var xhr = new XMLHttpRequest();
+                var myHeaders = new Headers();
+               
+                myHeaders.append("Content-Type", "application/json");
+                for(i in this.header_row){
+                    myHeaders.append(i, this.header_row[i]);
+                }
 
-                  xhr.open(method, url, true);
-                  xhr.responseType = responseType;
-                  if(authType=='basciauth'){
+                if(this.authType=='basciauth'){
                     console.log("BASIC AUTH");
-                    console.log(btoa(basicauth_username+":"+basicauth_password));
-                   xhr.setRequestHeader("Authorization", "Basic " + btoa(basicauth_username+":"+basicauth_password)); 
+                    console.log(btoa(this.basicauth_username+":"+this.basicauth_password));
+                   myHeaders.append("Authorization", "Basic " + btoa(this.basicauth_username+":"+this.basicauth_password)); 
                   }
-                   if(authType=='bearertoken'){
-                     xhr.setRequestHeader("Authorization", "Bearer "+bearertoken_token); 
+                   if(this.authType=='bearertoken'){
+                     myHeaders.append("Authorization", "Bearer "+this.bearertoken_token); 
                   }
-                  if(authType=='oauthtwo'){
-                       xhr.setRequestHeader("Authorization", "Bearer "+oauthtwo_token); 
-                  }
-                  for(let i=0;i<header.length;i++){
-                        xhr.setRequestHeader(header[i]["key"],header[i]["value"])
-                  }
-                  if(body!=null){
-                        console.log(body)
-                       xhr.send(JSON.stringify(body,undefined,2))
-
-                  }
-                  else{
-                     xhr.send();
-
+                  if(this.authType=='oauthtwo'){
+                          myHeaders.append("Authorization", "Bearer "+this.oauthtwo_token); 
                   }
 
-                  xhr.onload = function() {
-                    var status = xhr.status;
-                    if (status === 200) {
-                      callback('200', xhr.response);
-                    } else {
-                      callback(status, xhr.response);
-                    }
-                  };
-              };
-              getJSON(
-                this.method,
-                this.url,
-                this.responseType,
-                this.header_row,
-                this.authType,
-                this.basicauth_username,
-                this.basicauth_password,
-                this.bearertoken_token,
-                this.oauthtwo_token,
-                this.body,
-              (status,data)=>{
-                this.resultCode=status
-                if(status=='404'){
-                  this.result=`{'message':'Not Found'}`
-                }
-                else{
-                this.result=data;
-                  db.push({
-                    "REQUEST NAME":this.requestName==null?"Untitiled Request":this.requestName,
-                    "URL":this.url,
-                    "METHOD":this.method,                                                                                                 
-                    "STATUS CODE":this.resultCode
-                  });
-                  this.historyDb=db;
-                  console.log(db);
-                }
-              });
+                var raw = JSON.stringify(this.body);
+
+                var requestOptions = {
+                  method: 'POST',
+                  headers: myHeaders,
+                  body: this.body,
+                  redirect: 'follow'
+                };
+
+                    fetch(this.url,requestOptions)
+                    .then(response =>{
+                      console.log(response);
+                        this.resultCode=response.status
+                        return response.json()
+                    } )
+                    .then(data => {
+                    this.result=data
+                          db.push({
+                              "REQUEST NAME":this.requestName==null?"Untitiled Request":this.requestName,
+                              "URL":this.url,
+                              "METHOD":"GET",                                                                                                 
+                              "STATUS CODE":this.resultCode
+                            });
+                            this.historyDb=db;
+                          console.log(data)
+                          }
+                    );
+
+            
+
+
+            // var getJSON = function(
+            //     method,
+            //     url,
+            //     responseType,
+            //     header,
+            //     authType,
+            //     basicauth_username,
+            //     basicauth_password,
+            //     bearertoken_token,
+            //     oauthtwo_token,
+            //     body,
+            //     callback) {
+            //       var xhr = new XMLHttpRequest();
+              
+                  
+            //       xhr.open(method, url, true);
+            //       xhr.setRequestHeader("Accept","application/json");
+            //       xhr.setRequestHeader("Accept","text/plain");
+            //       xhr.responseType = "application/json";
+            //       if(authType=='basciauth'){
+            //         console.log("BASIC AUTH");
+            //         console.log(btoa(basicauth_username+":"+basicauth_password));
+            //        xhr.setRequestHeader("Authorization", "Basic " + btoa(basicauth_username+":"+basicauth_password)); 
+            //       }
+            //        if(authType=='bearertoken'){
+            //          xhr.setRequestHeader("Authorization", "Bearer "+bearertoken_token); 
+            //       }
+            //       if(authType=='oauthtwo'){
+            //            xhr.setRequestHeader("Authorization", "Bearer "+oauthtwo_token); 
+            //       }
+            //       for(let i=0;i<header.length;i++){
+            //             xhr.setRequestHeader(header[i]["key"],header[i]["value"])
+            //       }
+
+
+            // // var obj={"glossary":{"title":"example glossary","GlossDiv":{"title":"S","GlossList":{"GlossEntry":{"ID":"SGML","SortAs":"SGML","GlossTerm":"Standard Generalized Markup Language","Acronym":"SGML","Abbrev":"ISO 8879:1986","GlossDef":{"para":"A meta-markup language, used to create markup languages such as DocBook.","GlossSeeAlso":["GML","XML"]},"GlossSee":"markup"}}}}}
+
+
+            //     var pretty = JSON.stringify(body, undefined, 2);
+            //       // if(body!=null){
+
+            //       // }
+            //       // else{
+            //       //    xhr.send();
+
+            //       // }
+
+            //       xhr.onload = function() {
+            //         var status = xhr.status;
+            //         if (status === 200) {
+            //           callback('200', xhr.response);
+            //         } else {
+            //           callback(status, xhr.response);
+            //         }
+            //       };
+            //       xhr.send(JSON.parse(pretty));
+
+                  
+            //   };
+            //   getJSON(
+            //     this.method,
+            //     this.url,
+            //     this.responseType,
+            //     this.header_row,
+            //     this.authType,
+            //     this.basicauth_username,
+            //     this.basicauth_password,
+            //     this.bearertoken_token,
+            //     this.oauthtwo_token,
+            //     this.body,
+            //   (status,data)=>{
+            //     this.resultCode=status
+            //     if(status=='404'){
+            //       this.result=`{'message':'Not Found'}`
+            //     }
+            //     else{
+            //     this.result=data;
+            //       db.push({
+            //         "REQUEST NAME":this.requestName==null?"Untitiled Request":this.requestName,
+            //         "URL":this.url,
+            //         "METHOD":this.method,                                                                                                 
+            //         "STATUS CODE":this.resultCode
+            //       });
+            //       this.historyDb=db;
+            //       console.log(db);
+            //     }
+            //   });
           }
               
         }
