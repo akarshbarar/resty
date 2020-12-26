@@ -154,21 +154,28 @@
               </select>
     
           <div v-if="authType=='basciauth'">
-            <h1>Bsic auth</h1>
+            <h1>Basic auth</h1>
+            <input type="text" class="form__field keyValue"  v-model="basicauth_username" placeholder="Enter Username">
+            <input type="text" class="form__field keyValue"  v-model="basicauth_password"  placeholder="Enter Password">
+            
             <!-- XMLReq.setRequestHeader("Authorization", "Basic " + btoa("username:password")); -->
           </div>
           <div v-if="authType=='bearertoken'">
             <h1>bearertoken auth</h1>
+            <input type="text" class="form__field keyValue" v-model="bearertoken_token" placeholder="Enter token">
+
             <!-- xhr.setRequestHeader("Authorization", "Bearer hhhh"); -->
 
           </div>
           <div v-if="authType=='oauthone'">
-            <h1>oauthone auth</h1>
+            <h1>OAuth One</h1>
+            <p>SOME ERROR OCCURED IN OAUTH1</p>
           </div>
           <div v-if="authType=='oauthtwo'">
             <h1>oauthtwo auth</h1>
+           <input type="text" class="form__field keyValue" v-model="oauthtwo_token"  placeholder="Enter token">
+
             <!-- xhr.setRequestHeader("Authorization", "Bearer ddd"); -->
-<!--  -->
           </div>
           <div v-if="authType=='digestauth'">
             <h1>digestauth auth</h1>
@@ -178,7 +185,7 @@
           </div>
         </div>
        <div id="tab-four-panel" class="panel">
-            <textarea class="textarea" cols="50" rows="20"/>
+            <textarea id ="myTextArea" v-model="body" class="textarea" cols="50" rows="20"/>
         </div>
 
     </div>
@@ -205,6 +212,16 @@ import db from '../content/db'
 export default {
 
   mounted(){
+
+
+
+// var obj={"glossary":{"title":"example glossary","GlossDiv":{"title":"S","GlossList":{"GlossEntry":{"ID":"SGML","SortAs":"SGML","GlossTerm":"Standard Generalized Markup Language","Acronym":"SGML","Abbrev":"ISO 8879:1986","GlossDef":{"para":"A meta-markup language, used to create markup languages such as DocBook.","GlossSeeAlso":["GML","XML"]},"GlossSee":"markup"}}}}}
+
+
+// var pretty = JSON.stringify(obj, undefined, 2);
+
+// var ugly = document.getElementById('myTextArea').value;
+// document.getElementById('myTextArea').value = pretty;
 
 
   },
@@ -239,7 +256,12 @@ export default {
           param_key:null,
           param_value:null,
           header_key:null,
-          header_value:null
+          header_value:null,
+          basicauth_username:null,
+          basicauth_password:null,
+          bearertoken_token:null,
+          oauthtwo_token:null,
+          body:null
       }
      
     },
@@ -283,6 +305,7 @@ export default {
 
       },
         async send(){
+
           if(this.method=='get'){
 
               var getJSON = function(method,url, responseType,callback) {
@@ -337,14 +360,48 @@ export default {
                 }
               }
             }
-            console.log(this.url);
-            var getJSON = function(method,url,responseType,header, callback) {
+
+
+            var getJSON = function(
+                method,
+                url,
+                responseType,
+                header,
+                authType,
+                basicauth_username,
+                basicauth_password,
+                bearertoken_token,
+                oauthtwo_token,
+                body,
+                callback) {
                   var xhr = new XMLHttpRequest();
+
                   xhr.open(method, url, true);
                   xhr.responseType = responseType;
+                  if(authType=='basciauth'){
+                    console.log("BASIC AUTH");
+                    console.log(btoa(basicauth_username+":"+basicauth_password));
+                   xhr.setRequestHeader("Authorization", "Basic " + btoa(basicauth_username+":"+basicauth_password)); 
+                  }
+                   if(authType=='bearertoken'){
+                     xhr.setRequestHeader("Authorization", "Bearer "+bearertoken_token); 
+                  }
+                  if(authType=='oauthtwo'){
+                       xhr.setRequestHeader("Authorization", "Bearer "+oauthtwo_token); 
+                  }
                   for(let i=0;i<header.length;i++){
                         xhr.setRequestHeader(header[i]["key"],header[i]["value"])
                   }
+                  if(body!=null){
+                        console.log(body)
+                       xhr.send(JSON.stringify(body,undefined,2))
+
+                  }
+                  else{
+                     xhr.send();
+
+                  }
+
                   xhr.onload = function() {
                     var status = xhr.status;
                     if (status === 200) {
@@ -353,9 +410,19 @@ export default {
                       callback(status, xhr.response);
                     }
                   };
-                  xhr.send();
               };
-              getJSON(this.method,this.url,this.responseType,this.header_row,(status,data)=>{
+              getJSON(
+                this.method,
+                this.url,
+                this.responseType,
+                this.header_row,
+                this.authType,
+                this.basicauth_username,
+                this.basicauth_password,
+                this.bearertoken_token,
+                this.oauthtwo_token,
+                this.body,
+              (status,data)=>{
                 this.resultCode=status
                 if(status=='404'){
                   this.result=`{'message':'Not Found'}`
