@@ -317,7 +317,7 @@ export default {
                     );
 
           }
-          if(this.method=='post'){
+          if(this.method=='post'||this.method=='put'||this.method=='delete' ||this.method=='patch'){
 
             this.url=this.url+"?";
             console.log("PArameter row is",this.parameter_row);
@@ -385,97 +385,6 @@ export default {
                           console.log(data)
                           }
                     );
-
-            
-
-
-            // var getJSON = function(
-            //     method,
-            //     url,
-            //     responseType,
-            //     header,
-            //     authType,
-            //     basicauth_username,
-            //     basicauth_password,
-            //     bearertoken_token,
-            //     oauthtwo_token,
-            //     body,
-            //     callback) {
-            //       var xhr = new XMLHttpRequest();
-              
-                  
-            //       xhr.open(method, url, true);
-            //       xhr.setRequestHeader("Accept","application/json");
-            //       xhr.setRequestHeader("Accept","text/plain");
-            //       xhr.responseType = "application/json";
-            //       if(authType=='basciauth'){
-            //         console.log("BASIC AUTH");
-            //         console.log(btoa(basicauth_username+":"+basicauth_password));
-            //        xhr.setRequestHeader("Authorization", "Basic " + btoa(basicauth_username+":"+basicauth_password)); 
-            //       }
-            //        if(authType=='bearertoken'){
-            //          xhr.setRequestHeader("Authorization", "Bearer "+bearertoken_token); 
-            //       }
-            //       if(authType=='oauthtwo'){
-            //            xhr.setRequestHeader("Authorization", "Bearer "+oauthtwo_token); 
-            //       }
-            //       for(let i=0;i<header.length;i++){
-            //             xhr.setRequestHeader(header[i]["key"],header[i]["value"])
-            //       }
-
-
-            // // var obj={"glossary":{"title":"example glossary","GlossDiv":{"title":"S","GlossList":{"GlossEntry":{"ID":"SGML","SortAs":"SGML","GlossTerm":"Standard Generalized Markup Language","Acronym":"SGML","Abbrev":"ISO 8879:1986","GlossDef":{"para":"A meta-markup language, used to create markup languages such as DocBook.","GlossSeeAlso":["GML","XML"]},"GlossSee":"markup"}}}}}
-
-
-            //     var pretty = JSON.stringify(body, undefined, 2);
-            //       // if(body!=null){
-
-            //       // }
-            //       // else{
-            //       //    xhr.send();
-
-            //       // }
-
-            //       xhr.onload = function() {
-            //         var status = xhr.status;
-            //         if (status === 200) {
-            //           callback('200', xhr.response);
-            //         } else {
-            //           callback(status, xhr.response);
-            //         }
-            //       };
-            //       xhr.send(JSON.parse(pretty));
-
-                  
-            //   };
-            //   getJSON(
-            //     this.method,
-            //     this.url,
-            //     this.responseType,
-            //     this.header_row,
-            //     this.authType,
-            //     this.basicauth_username,
-            //     this.basicauth_password,
-            //     this.bearertoken_token,
-            //     this.oauthtwo_token,
-            //     this.body,
-            //   (status,data)=>{
-            //     this.resultCode=status
-            //     if(status=='404'){
-            //       this.result=`{'message':'Not Found'}`
-            //     }
-            //     else{
-            //     this.result=data;
-            //       db.push({
-            //         "REQUEST NAME":this.requestName==null?"Untitiled Request":this.requestName,
-            //         "URL":this.url,
-            //         "METHOD":this.method,                                                                                                 
-            //         "STATUS CODE":this.resultCode
-            //       });
-            //       this.historyDb=db;
-            //       console.log(db);
-            //     }
-            //   });
           }
               
         }
